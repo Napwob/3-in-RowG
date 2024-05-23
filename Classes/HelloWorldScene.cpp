@@ -73,7 +73,9 @@ bool HelloWorld::init()
     score_label->addClickEventListener(CC_CALLBACK_0(HelloWorld::updateScore, this));
     this->addChild(score_label);
 
-    endgame_label = ui::Text::create("END", "Arial", 100);
+    endgame_label = ui::Text::create("X", "Arial", 200);
+    endgame_label->setTextColor(Color4B(255, 255, 0, 255));
+
     endgame_label->setPosition(Vec2(visibleWidth / 2, visibleHeight / 2));
     endgame_label->setVisible(false);
     endgame_label->setLocalZOrder(1);
