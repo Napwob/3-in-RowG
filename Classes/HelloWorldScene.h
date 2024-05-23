@@ -26,7 +26,8 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
-
+#include "ui/CocosGUI.h"
+#include "extensions/cocos-ext.h"
 #include "cocos/ui/UIButton.h"
 
 class Gem : public cocos2d::ui::Button
@@ -98,6 +99,7 @@ private:
 
     int grid_size_x;
     int grid_size_y;
+
     void setGridSize(int x, int y)
     {
         grid_size_x = x;
@@ -112,20 +114,47 @@ private:
         return grid_size_y;
     }
 
-    void printLogGrid();
+    int color_number;
+    void setGemsColorNumber(int number)
+    {
+        color_number = number;
+    }
+    int getGemsColorNumber()
+    {
+        return color_number;
+    }
+    int score;
+    void setScore(int score_number)
+    {
+        score = score_number;
+    }
+    void raiseScore(int score_number)
+    {
+        score+=score_number;
+    }
+    int getScore()
+    {
+        return score;
+    }
+    void updateScore();
+
+    void onStartClicked(Ref* sender);
+    void setHardLever(Ref* sender, cocos2d::ui::Slider::EventType type);
 
     bool isInRange(int value, int min_v, int max_v);
-    void chainReaction(int x, int y);
-    void onStartClicked(Ref* sender);
 
-    void createGem(int x, int y, int color);
     void initGems(int array_size_x, int array_size_y);
     void deleteGems();
-    void onGemClicked(Ref* sender);
+
+    void onBombClicked(Ref* sender, int exposionRadius);
+    void removeAllNeighbors(int x, int y, int exposionRadius);
 
     int neighborsCheck(int x, int y, int color);
     int checkSameColorNeighbors(int x, int y);
+
+    void onGemClicked(Ref* sender);
     void removeSameColorNeighbors(int x, int y, int color, bool removeNeighbors);
+
     void dropGemsDown();
 
     CREATE_FUNC(HelloWorld);
