@@ -49,7 +49,7 @@ bool HelloWorld::init()
     float buttonWidth = buttonSize.width;
     float buttonHeight = buttonSize.height;
 
-    button->setPosition(Vec2(visibleWidth/2 + buttonWidth, visibleHeight - buttonHeight /1.5));
+    button->setPosition(Vec2(visibleWidth/2 + buttonWidth + 5, visibleHeight - buttonHeight /1.5));
     button->setTitleText("Начать");
     button->setTitleFontSize(24);
     button->addClickEventListener(CC_CALLBACK_1(HelloWorld::onStartClicked, this));
@@ -60,12 +60,16 @@ bool HelloWorld::init()
     slider->loadBarTexture("hardbar.png");
     slider->loadSlidBallTextureNormal("roller.png");
     slider->loadProgressBarTexture("hardbar.png");
-    slider->setPosition(Vec2(visibleWidth / 2 - buttonWidth, visibleHeight - buttonHeight / 1.5));
+    slider->setPosition(Vec2(visibleWidth / 2 - buttonWidth, visibleHeight - buttonHeight / 1.5 - 10));
     slider->addEventListener(CC_CALLBACK_2(HelloWorld::setHardLever, this));
     this->addChild(slider);
 
+    ui::Text* roler_label = ui::Text::create("Сложность", "Arial", 24);
+    roler_label->setPosition(Vec2(visibleWidth / 2 - buttonWidth , visibleHeight - buttonHeight / 1.5 + 14));
+    this->addChild(roler_label);
+
     score_label = ui::Text::create("0", "Arial", 24);
-    score_label->setPosition(Vec2(visibleWidth / 2, visibleHeight - buttonHeight / 1.5));
+    score_label->setPosition(Vec2(visibleWidth / 2 + 5, visibleHeight - buttonHeight / 1.5));
     score_label->addClickEventListener(CC_CALLBACK_0(HelloWorld::updateScore, this));
     this->addChild(score_label);
 
@@ -74,6 +78,10 @@ bool HelloWorld::init()
     endgame_label->setVisible(false);
     endgame_label->setLocalZOrder(1);
     this->addChild(endgame_label);
+
+    auto sprite = Sprite::create("background.png");
+    sprite->setPosition(Vec2(visibleWidth/2, visibleHeight/2));
+    this->addChild(sprite, 0);
 
     return true;
 }
@@ -95,7 +103,6 @@ void HelloWorld::setHardLever(Ref* sender, ui::Slider::EventType type)
 
 void HelloWorld::onStartClicked(Ref* sender)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
     cocos2d::ui::Button* button = dynamic_cast<cocos2d::ui::Button*>(sender);
     static bool gemInited = false;
     if (gemInited == false)
@@ -196,8 +203,8 @@ void HelloWorld::initGems(int array_size_x, int array_size_y)
             gem->setColor(gem_color);
             gem->setXY(i, j);
 
-            float posX = offsetX + j * gemWidth;
-            float posY = offsetY - i * gemHeight;
+            float posX = offsetX + j * gemWidth + 16;
+            float posY = offsetY - i * gemHeight - 16;
 
             gem->setPosition(Vec2(posX, posY));
             this->addChild(gem);
@@ -223,34 +230,27 @@ bool HelloWorld::isInRange(int value, int min_v, int max_v)
 
 int HelloWorld::neighborsCheck(int x, int y, int color)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
-
     int rangeX = HelloWorld::getGridSizeX();
     int rangeY = HelloWorld::getGridSizeY();
 
     if (!isInRange(x, 0, rangeX) || !isInRange(y, 0, rangeY) || !gemGrid[x][y] || gemGrid[x][y]->getColor() != color)
         return 0;
-    log("color: %d", color);
 
     int neighbors_count = 0;
     if (isInRange(x - 1, 0, rangeX) && gemGrid[x - 1][y] && gemGrid[x - 1][y]->getColor() == color)
     {
-        log("up");
         neighbors_count++;
     }
     if (isInRange(x + 1, 0, rangeX) && gemGrid[x + 1][y] && gemGrid[x + 1][y]->getColor() == color)
     {
-        log("down");
         neighbors_count++;
     }
     if (isInRange(y - 1, 0, rangeY) && gemGrid[x][y - 1] && gemGrid[x][y - 1]->getColor() == color)
     {
-        log("left");
         neighbors_count++;
     }
     if (isInRange(y + 1, 0, rangeY) && gemGrid[x][y + 1] && gemGrid[x][y + 1]->getColor() == color)
     {
-        log("right");
         neighbors_count++;
     }
 
@@ -259,43 +259,32 @@ int HelloWorld::neighborsCheck(int x, int y, int color)
 
 int HelloWorld::checkSameColorNeighbors(int x, int y)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
-
     int rangeX = HelloWorld::getGridSizeX();
     int rangeY = HelloWorld::getGridSizeY();
 
     if (!isInRange(x, 0, rangeX) || !isInRange(y, 0, rangeY) || !gemGrid[x][y])
-    {
-        log("main check");
         return false;
-    }
-    log("%d",__LINE__);
+
     int color = gemGrid[x][y]->getColor();
-    log("%d",__LINE__);
+
     if (neighborsCheck(x, y, color) >= 2)
-    {
-        log("first");
         return true;
-    }
     else
     {
         int counter = neighborsCheck(x - 1, y, color) +
                       neighborsCheck(x + 1, y, color) +
                       neighborsCheck(x, y - 1, color) +
                       neighborsCheck(x, y + 1, color);
-        log("second %d", counter);
+
         if (counter >= 2)
            return true;
     }
 
-    log("nothing");
     return false;
 }
 
 void HelloWorld::removeSameColorNeighbors(int x, int y, int color, bool removeNeighbors)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
-
     int rangeX = HelloWorld::getGridSizeX();
     int rangeY = HelloWorld::getGridSizeY();
 
@@ -314,7 +303,6 @@ void HelloWorld::removeSameColorNeighbors(int x, int y, int color, bool removeNe
 
 void HelloWorld::dropGemsDown()
 {
-    log("%s %d", __FUNCTION__, __LINE__);
     for (int col = 0; col < gemGrid[0].size(); col++)
     {
         int emptySpaces = 0;
@@ -371,13 +359,12 @@ bool HelloWorld::endGameCheck()
 
 void HelloWorld::onGemClicked(Ref* sender)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
     Gem* gem = dynamic_cast<Gem*>(sender);
     if (gem)
     {
         int buttonX = gem->getX();
         int buttonY = gem->getY();
-        log("button %d %d", buttonX, buttonY);
+
         int color = gem->getColor();
         if (checkSameColorNeighbors(buttonX, buttonY))
         {
@@ -388,16 +375,12 @@ void HelloWorld::onGemClicked(Ref* sender)
         {
             dropScore(1);
         }
-
-        log("Pressed button at position (%d, %d)", buttonX, buttonY);
     }
-    log("Score: %d", getScore());
     this->updateScore();
 }
 
 void HelloWorld::onBombClicked(Ref* sender, int exposionRadius)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
     Gem* gem = dynamic_cast<Gem*>(sender);
     if (gem)
     {
@@ -405,17 +388,13 @@ void HelloWorld::onBombClicked(Ref* sender, int exposionRadius)
         int buttonY = gem->getY();
         removeAllNeighbors(buttonX, buttonY, exposionRadius);
         dropGemsDown();
-
-        log("Pressed button at position (%d, %d)", buttonX, buttonY);
     }
-    log("Score: %d", getScore());
+
     this->updateScore();
 }
 
 void HelloWorld::removeAllNeighbors(int x, int y, int exposionRadius)
 {
-    log("%s %d", __FUNCTION__, __LINE__);
-
     int rangeX = getGridSizeX();
     int rangeY = getGridSizeY();
 
