@@ -87,7 +87,7 @@ private:
     int color_;
 };
 
-class HelloWorld : public cocos2d::Scene
+class RowGame : public cocos2d::Scene
 {
 public:
     static cocos2d::Scene* createScene();
@@ -165,7 +165,7 @@ private:
 
     bool endGameCheck();
 
-    CREATE_FUNC(HelloWorld);
+    CREATE_FUNC(RowGame);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

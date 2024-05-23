@@ -79,7 +79,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
     if(!glview) {
-        glview = GLViewImpl::createWithRect("HelloCpp", cocos2d::Rect(0, 0, mediumResolutionSize.width, mediumResolutionSize.height));
+        glview = GLViewImpl::createWithRect("3 in Gravity Row", cocos2d::Rect(0, 0, mediumResolutionSize.width, mediumResolutionSize.height));
         director->setOpenGLView(glview);
     }
 
@@ -99,7 +99,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    auto scene = RowGame::createScene();
 
     // run
     director->runWithScene(scene);

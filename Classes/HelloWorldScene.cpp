@@ -9,9 +9,9 @@
 
 USING_NS_CC;
 
-Scene* HelloWorld::createScene()
+Scene* RowGame::createScene()
 {
-    return HelloWorld::create();
+    return RowGame::create();
 }
 
 static void problemLoading(const char* filename)
@@ -24,7 +24,7 @@ ui::Text* endgame_label;
 ui::Text* score_label;
 ui::Slider* slider;
 
-bool HelloWorld::init()
+bool RowGame::init()
 {
     if ( !Scene::init() )
     {
@@ -36,8 +36,8 @@ bool HelloWorld::init()
 
     srand(static_cast<unsigned>(time(nullptr)));
 
-    HelloWorld::setGridSize(10, 16);
-    HelloWorld::setGemsColorNumber(2);
+    RowGame::setGridSize(10, 16);
+    RowGame::setGemsColorNumber(2);
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     float visibleWidth = visibleSize.width;
@@ -52,7 +52,7 @@ bool HelloWorld::init()
     button->setPosition(Vec2(visibleWidth/2 + buttonWidth + 5, visibleHeight - buttonHeight /1.5));
     button->setTitleText("Начать");
     button->setTitleFontSize(24);
-    button->addClickEventListener(CC_CALLBACK_1(HelloWorld::onStartClicked, this));
+    button->addClickEventListener(CC_CALLBACK_1(RowGame::onStartClicked, this));
     this->addChild(button);
 
     slider = ui::Slider::create();
@@ -61,7 +61,7 @@ bool HelloWorld::init()
     slider->loadSlidBallTextureNormal("roller.png");
     slider->loadProgressBarTexture("hardbar.png");
     slider->setPosition(Vec2(visibleWidth / 2 - buttonWidth, visibleHeight - buttonHeight / 1.5 - 10));
-    slider->addEventListener(CC_CALLBACK_2(HelloWorld::setHardLever, this));
+    slider->addEventListener(CC_CALLBACK_2(RowGame::setHardLever, this));
     this->addChild(slider);
 
     ui::Text* roler_label = ui::Text::create("Сложность", "Arial", 24);
@@ -70,7 +70,7 @@ bool HelloWorld::init()
 
     score_label = ui::Text::create("0", "Arial", 24);
     score_label->setPosition(Vec2(visibleWidth / 2 + 5, visibleHeight - buttonHeight / 1.5));
-    score_label->addClickEventListener(CC_CALLBACK_0(HelloWorld::updateScore, this));
+    score_label->addClickEventListener(CC_CALLBACK_0(RowGame::updateScore, this));
     this->addChild(score_label);
 
     endgame_label = ui::Text::create("X", "Arial", 200);
@@ -88,28 +88,28 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::updateScore() {
+void RowGame::updateScore() {
     std::string newScore = std::to_string(getScore());
     score_label->setString(newScore); // Обновляем текст объекта ui::Text
 }
 
-void HelloWorld::setHardLever(Ref* sender, ui::Slider::EventType type)
+void RowGame::setHardLever(Ref* sender, ui::Slider::EventType type)
 {
     if (type == ui::Slider::EventType::ON_PERCENTAGE_CHANGED)
     {
         ui::Slider *slider = dynamic_cast<cocos2d::ui::Slider*>(sender);
         int hardLevel = slider->getPercent()+2;
-        HelloWorld::setGemsColorNumber(hardLevel);
+        RowGame::setGemsColorNumber(hardLevel);
     }
 }
 
-void HelloWorld::onStartClicked(Ref* sender)
+void RowGame::onStartClicked(Ref* sender)
 {
     cocos2d::ui::Button* button = dynamic_cast<cocos2d::ui::Button*>(sender);
     static bool gemInited = false;
     if (gemInited == false)
     {
-        HelloWorld::initGems(HelloWorld::getGridSizeX(), HelloWorld::getGridSizeY());
+        RowGame::initGems(RowGame::getGridSizeX(), RowGame::getGridSizeY());
         gemInited = true;
         button->setTitleText("Закончить");
         button->setTitleFontSize(20);
@@ -118,7 +118,7 @@ void HelloWorld::onStartClicked(Ref* sender)
     }
     else
     {
-        HelloWorld::deleteGems();
+        RowGame::deleteGems();
         gemInited = false;
         button->setTitleText("Начать");
         button->setTitleFontSize(24);
@@ -128,12 +128,12 @@ void HelloWorld::onStartClicked(Ref* sender)
     this->updateScore();
 }
 
-void HelloWorld::deleteGems()
+void RowGame::deleteGems()
 {
-    for (int i = 0; i < HelloWorld::getGridSizeX(); ++i)
+    for (int i = 0; i < RowGame::getGridSizeX(); ++i)
     {
         std::vector<Gem*> gemRow;
-        for (int j = 0; j < HelloWorld::getGridSizeY(); ++j)
+        for (int j = 0; j < RowGame::getGridSizeY(); ++j)
         {
             if (gemGrid[i][j] != nullptr)
             {
@@ -146,14 +146,14 @@ void HelloWorld::deleteGems()
     gemGrid.clear();
 }
 
-void HelloWorld::initGems(int array_size_x, int array_size_y)
+void RowGame::initGems(int array_size_x, int array_size_y)
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     float visibleWidth = visibleSize.width;
     float visibleHeight = visibleSize.height;
 
-    int gridSizeX = HelloWorld::getGridSizeX();
-    int gridSizeY = HelloWorld::getGridSizeY();
+    int gridSizeX = RowGame::getGridSizeX();
+    int gridSizeY = RowGame::getGridSizeY();
 
     int middleX = visibleWidth / 2;
     int middleY = visibleHeight / 2;
@@ -212,28 +212,28 @@ void HelloWorld::initGems(int array_size_x, int array_size_y)
             this->addChild(gem);
 
             if (gem_color == 6)
-                gem->addClickEventListener(CC_CALLBACK_1(HelloWorld::onBombClicked, this, 1));
+                gem->addClickEventListener(CC_CALLBACK_1(RowGame::onBombClicked, this, 1));
             else if (gem_color == 7)
-                gem->addClickEventListener(CC_CALLBACK_1(HelloWorld::onBombClicked, this, 2));
+                gem->addClickEventListener(CC_CALLBACK_1(RowGame::onBombClicked, this, 2));
             else
-                gem->addClickEventListener(CC_CALLBACK_1(HelloWorld::onGemClicked, this));
+                gem->addClickEventListener(CC_CALLBACK_1(RowGame::onGemClicked, this));
             rowGems.push_back(gem);
         }
         gemGrid.push_back(rowGems);
     }
 }
 
-bool HelloWorld::isInRange(int value, int min_v, int max_v)
+bool RowGame::isInRange(int value, int min_v, int max_v)
 {
     if (value >= min_v && value < max_v)
         return true;
     return false;
 }
 
-int HelloWorld::neighborsCheck(int x, int y, int color)
+int RowGame::neighborsCheck(int x, int y, int color)
 {
-    int rangeX = HelloWorld::getGridSizeX();
-    int rangeY = HelloWorld::getGridSizeY();
+    int rangeX = RowGame::getGridSizeX();
+    int rangeY = RowGame::getGridSizeY();
 
     if (!isInRange(x, 0, rangeX) || !isInRange(y, 0, rangeY) || !gemGrid[x][y] || gemGrid[x][y]->getColor() != color)
         return 0;
@@ -259,10 +259,10 @@ int HelloWorld::neighborsCheck(int x, int y, int color)
     return neighbors_count;
 }
 
-int HelloWorld::checkSameColorNeighbors(int x, int y)
+int RowGame::checkSameColorNeighbors(int x, int y)
 {
-    int rangeX = HelloWorld::getGridSizeX();
-    int rangeY = HelloWorld::getGridSizeY();
+    int rangeX = RowGame::getGridSizeX();
+    int rangeY = RowGame::getGridSizeY();
 
     if (!isInRange(x, 0, rangeX) || !isInRange(y, 0, rangeY) || !gemGrid[x][y])
         return false;
@@ -285,10 +285,10 @@ int HelloWorld::checkSameColorNeighbors(int x, int y)
     return false;
 }
 
-void HelloWorld::removeSameColorNeighbors(int x, int y, int color, bool removeNeighbors)
+void RowGame::removeSameColorNeighbors(int x, int y, int color, bool removeNeighbors)
 {
-    int rangeX = HelloWorld::getGridSizeX();
-    int rangeY = HelloWorld::getGridSizeY();
+    int rangeX = RowGame::getGridSizeX();
+    int rangeY = RowGame::getGridSizeY();
 
     if (!isInRange(x, 0, rangeX) || !isInRange(y, 0, rangeY) || !gemGrid[x][y] || gemGrid[x][y]->getColor() != color)
         return;
@@ -303,7 +303,7 @@ void HelloWorld::removeSameColorNeighbors(int x, int y, int color, bool removeNe
     removeSameColorNeighbors(x, y + 1, color, true);
 }
 
-void HelloWorld::dropGemsDown()
+void RowGame::dropGemsDown()
 {
     for (int col = 0; col < gemGrid[0].size(); col++)
     {
@@ -340,10 +340,10 @@ void HelloWorld::dropGemsDown()
         endgame_label->setVisible(true);
 }
 
-bool HelloWorld::endGameCheck()
+bool RowGame::endGameCheck()
 {
-    int gridSizeX = HelloWorld::getGridSizeX();
-    int gridSizeY = HelloWorld::getGridSizeY();
+    int gridSizeX = RowGame::getGridSizeX();
+    int gridSizeY = RowGame::getGridSizeY();
 
     for (int i = 0; i < gridSizeX; ++i)
     {
@@ -359,7 +359,7 @@ bool HelloWorld::endGameCheck()
     return true;
 }
 
-void HelloWorld::onGemClicked(Ref* sender)
+void RowGame::onGemClicked(Ref* sender)
 {
     Gem* gem = dynamic_cast<Gem*>(sender);
     if (gem)
@@ -381,7 +381,7 @@ void HelloWorld::onGemClicked(Ref* sender)
     this->updateScore();
 }
 
-void HelloWorld::onBombClicked(Ref* sender, int exposionRadius)
+void RowGame::onBombClicked(Ref* sender, int exposionRadius)
 {
     Gem* gem = dynamic_cast<Gem*>(sender);
     if (gem)
@@ -395,7 +395,7 @@ void HelloWorld::onBombClicked(Ref* sender, int exposionRadius)
     this->updateScore();
 }
 
-void HelloWorld::removeAllNeighbors(int x, int y, int exposionRadius)
+void RowGame::removeAllNeighbors(int x, int y, int exposionRadius)
 {
     int rangeX = getGridSizeX();
     int rangeY = getGridSizeY();
