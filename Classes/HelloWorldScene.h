@@ -130,7 +130,13 @@ private:
     }
     void raiseScore(int score_number)
     {
-        score+=score_number;
+        score+=score_number*getGemsColorNumber()-1;
+    }
+    void dropScore(int score_number)
+    {
+        score -= score_number * getGemsColorNumber() - 1;
+        if (score < 0)
+            score = 0;
     }
     int getScore()
     {
@@ -156,6 +162,8 @@ private:
     void removeSameColorNeighbors(int x, int y, int color, bool removeNeighbors);
 
     void dropGemsDown();
+
+    bool endGameCheck();
 
     CREATE_FUNC(HelloWorld);
 };

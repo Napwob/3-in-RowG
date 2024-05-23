@@ -20,7 +20,9 @@ static void problemLoading(const char* filename)
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
 
+ui::Text* endgame_label;
 ui::Text* score_label;
+ui::Slider* slider;
 
 bool HelloWorld::init()
 {
@@ -53,7 +55,7 @@ bool HelloWorld::init()
     button->addClickEventListener(CC_CALLBACK_1(HelloWorld::onStartClicked, this));
     this->addChild(button);
 
-    ui::Slider* slider = ui::Slider::create();
+    slider = ui::Slider::create();
     slider->setMaxPercent(4);
     slider->loadBarTexture("hardbar.png");
     slider->loadSlidBallTextureNormal("roller.png");
@@ -66,6 +68,12 @@ bool HelloWorld::init()
     score_label->setPosition(Vec2(visibleWidth / 2, visibleHeight - buttonHeight / 1.5));
     score_label->addClickEventListener(CC_CALLBACK_0(HelloWorld::updateScore, this));
     this->addChild(score_label);
+
+    endgame_label = ui::Text::create("END", "Arial", 100);
+    endgame_label->setPosition(Vec2(visibleWidth / 2, visibleHeight / 2));
+    endgame_label->setVisible(false);
+    endgame_label->setLocalZOrder(1);
+    this->addChild(endgame_label);
 
     return true;
 }
@@ -97,6 +105,7 @@ void HelloWorld::onStartClicked(Ref* sender)
         button->setTitleText("Закончить");
         button->setTitleFontSize(20);
         setScore(0);
+        slider->setEnabled(false);
     }
     else
     {
@@ -104,7 +113,9 @@ void HelloWorld::onStartClicked(Ref* sender)
         gemInited = false;
         button->setTitleText("Начать");
         button->setTitleFontSize(24);
+        slider->setEnabled(true);
     }
+    endgame_label->setVisible(false);
     this->updateScore();
 }
 
@@ -155,9 +166,9 @@ void HelloWorld::initGems(int array_size_x, int array_size_y)
         {
             Gem* gem = nullptr;
             int gem_color = 0;
-            if (rand() % 100 < 5)
+            if (rand() % 100 < 3)
             {
-                if (rand() % 100 < 20)
+                if (rand() % 100 < 10)
                     gem_color = 7;
                 else
                     gem_color = 6;
@@ -335,6 +346,27 @@ void HelloWorld::dropGemsDown()
             }
         }
     }
+    if (endGameCheck())
+        endgame_label->setVisible(true);
+}
+
+bool HelloWorld::endGameCheck()
+{
+    int gridSizeX = HelloWorld::getGridSizeX();
+    int gridSizeY = HelloWorld::getGridSizeY();
+
+    for (int i = 0; i < gridSizeX; ++i)
+    {
+        for (int j = 0; j < gridSizeY; ++j)
+        {
+            if (gemGrid[i][j])
+                if (checkSameColorNeighbors(i, j) ||
+                    gemGrid[i][j]->getColor() == 6 ||
+                    gemGrid[i][j]->getColor() == 7)
+                    return false;
+        }
+    }
+    return true;
 }
 
 void HelloWorld::onGemClicked(Ref* sender)
@@ -351,6 +383,10 @@ void HelloWorld::onGemClicked(Ref* sender)
         {
             removeSameColorNeighbors(buttonX, buttonY, color, false);
             dropGemsDown();
+        }
+        else
+        {
+            dropScore(1);
         }
 
         log("Pressed button at position (%d, %d)", buttonX, buttonY);
@@ -382,10 +418,10 @@ void HelloWorld::removeAllNeighbors(int x, int y, int exposionRadius)
 
     int rangeX = getGridSizeX();
     int rangeY = getGridSizeY();
-    raiseScore(1);
 
     gemGrid[x][y]->removeFromParent();
     gemGrid[x][y] = nullptr;
+    raiseScore(1);
 
     for (int i = x - exposionRadius; i < x + exposionRadius + 1; i++)
     {
